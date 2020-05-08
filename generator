@@ -1,0 +1,45 @@
+import csv
+import random
+from typing import List
+
+import prettytable
+from prettytable import PrettyTable
+
+
+def import_entries():
+    entries = []
+    with open("grid_entries.csv") as csvfile:
+        for row in csv.reader(csvfile):
+            for entry in row:
+                entries.append(entry)
+        return entries
+
+
+def generate(entries: List[str]) -> List[List[str]]:
+    grid = []
+    grid_width = 5
+    for x in range(grid_width):
+        grid.append([])
+        for _ in range(grid_width):
+            grid[x].append(entries.pop())
+    grid[grid_width // 2][grid_width // 2] = "X"
+    return grid
+
+
+def main():
+    random.seed()
+    sub_entries = random.sample(import_entries(), 25)
+    grid = generate(sub_entries)
+    table = PrettyTable(header=False, border=True, hrules=prettytable.ALL, vrules=prettytable.ALL,
+                        padding_width=3)
+    for row in grid:
+        table.add_row(row)
+    # table.set_style(prettytable.RANDOM)
+    print(table.get_string())
+    with open("grid.html", "w") as file:
+        file.write(table.get_html_string(format=True))
+
+
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()
