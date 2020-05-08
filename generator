@@ -1,12 +1,72 @@
 import csv
 import random
+from sys import stdout
 from typing import List
 
 import prettytable
 from prettytable import PrettyTable
 
+GRID_WIDTH = 5
 
-def import_entries():
+
+def export_table_to_html(table: PrettyTable) -> None:
+    """
+    Export grid to grid.html file
+    :param table: PrettyTable representation of our table.
+    """
+    with open("grid.html", "w") as file:
+        file.write(table.get_html_string(format=True))
+
+
+def build_table(grid: List[List[str]]) -> PrettyTable:
+    """
+    Move our 2-dimension list to a PrettyTable representation
+    :param grid: 2-dimension list of the grid
+    :return: PrettyTable representation
+    """
+    table = PrettyTable(header=False,
+                        border=True,
+                        hrules=prettytable.ALL,
+                        vrules=prettytable.ALL,
+                        padding_width=3)
+    [table.add_row(row) for row in grid]
+    return table
+
+
+def generate(entries: List[str]) -> List[List[str]]:
+    """
+    Arrange a list of entries into a grid.
+    Grid size is defined by GRID_WIDTH constant.
+    :param entries: list of entries to be arranged
+    :return: the arranged grid
+    """
+    assert len(entries) == GRID_WIDTH ** 2
+    grid = []
+    for x in range(GRID_WIDTH):
+        grid.append([])
+        for _ in range(GRID_WIDTH):
+            grid[x].append(entries.pop())
+    # center of grid is "free" space
+    grid[GRID_WIDTH // 2][GRID_WIDTH // 2] = "X"
+    return grid
+
+
+def get_random_entries(entries: List[str], sub_entries_size=GRID_WIDTH ** 2) -> List[str]:
+    """
+    Get a randomized sublist of a provided string list.
+    :param entries: collection to filter and randomize
+    :param sub_entries_size: how many to keep
+    :return:
+    """
+    random.seed()
+    return random.sample(entries, sub_entries_size)
+
+
+def import_entries() -> List[str]:
+    """
+    Import the entries from grid_entries.csv into a list of strings.
+    :return: list of string containing entries.
+    """
     entries = []
     with open("grid_entries.csv") as csvfile:
         for row in csv.reader(csvfile):
@@ -15,29 +75,13 @@ def import_entries():
         return entries
 
 
-def generate(entries: List[str]) -> List[List[str]]:
-    grid = []
-    grid_width = 5
-    for x in range(grid_width):
-        grid.append([])
-        for _ in range(grid_width):
-            grid[x].append(entries.pop())
-    grid[grid_width // 2][grid_width // 2] = "X"
-    return grid
-
-
 def main():
-    random.seed()
-    sub_entries = random.sample(import_entries(), 25)
+    entries = import_entries()
+    sub_entries = get_random_entries(entries)
     grid = generate(sub_entries)
-    table = PrettyTable(header=False, border=True, hrules=prettytable.ALL, vrules=prettytable.ALL,
-                        padding_width=3)
-    for row in grid:
-        table.add_row(row)
-    # table.set_style(prettytable.RANDOM)
-    print(table.get_string())
-    with open("grid.html", "w") as file:
-        file.write(table.get_html_string(format=True))
+    table = build_table(grid)
+    export_table_to_html(table)
+    stdout.write(table.get_string())
 
 
 if __name__ == "__main__":
