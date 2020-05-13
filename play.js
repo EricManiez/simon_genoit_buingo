@@ -33,10 +33,13 @@ class Grid {
      * @param {DOMElement} element 
      */
     resetButton() {
-        document.getElementById('reset').addEventListener('click', (e) => {
-            e.preventDefault()
-            this.reset(this.element)
-        })
+        let buttons = document.getElementsByClassName('reset')
+        for(let button of buttons) {
+            button.addEventListener('click', (e) => {
+                e.preventDefault()
+                this.reset(this.element)
+            })
+        }
     }
     
     /**
@@ -145,7 +148,7 @@ class Grid {
      */
     setValues(e, cell) {
         if(e.target.tagName == 'TD') {
-            e.target.style.backgroundColor = (cell.value == 1) ? 'red' : ''
+            e.target.style.backgroundColor = (cell.value == 1) ? '#33b5e5' : ''
             this.setRowValue(cell)
             this.setColumnValue(cell)
             this.setDiagValue(cell)
@@ -170,8 +173,9 @@ class Grid {
      */
     win() {
         this.reset(this.element)
-        this.element.style.backgroundColor = 'green'
-        alert('Bravo !')
+        this.element.style.backgroundColor = '#00C851'
+        $('#myModal').modal("show")
+        //alert('Bravo !')
     }
 }
 
