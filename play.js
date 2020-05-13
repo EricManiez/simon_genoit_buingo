@@ -175,7 +175,6 @@ class Grid {
         this.reset(this.element)
         this.element.style.backgroundColor = '#00C851'
         $('#myModal').modal("show")
-        //alert('Bravo !')
     }
 }
 
