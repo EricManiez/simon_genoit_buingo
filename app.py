@@ -1,23 +1,12 @@
 import csv
 import random
-from sys import stdout
-from typing import List, Tuple, Iterator
+from typing import List
 
-from jinja2 import Template
+from flask import Flask, render_template, url_for
+
+app = Flask(__name__)
 
 GRID_WIDTH = 5
-
-
-def export_table_to_html(grid_values: Iterator[Tuple[str, str]]) -> str:
-    """
-    Export grid values to index.html file
-    """
-    with open('template.html') as file_:
-        template = Template(file_.read())
-    with open("index.html", "w") as file:
-        html = template.render(values=grid_values, width=GRID_WIDTH)
-        file.write(html)
-    return html
 
 
 def get_table_ids():
@@ -56,13 +45,14 @@ def import_entries() -> List[str]:
         return entries
 
 
-def main():
+@app.route('/play')
+def play():
+    url_for('static', filename='grid.css')
+    url_for('static', filename='play.js')
     entries = import_entries()
     sub_entries = get_random_entries(entries)
-    html = export_table_to_html(zip(get_table_ids(), sub_entries))
-    stdout.write(html)
+    return render_template("play.html", values=zip(get_table_ids(), sub_entries), width=GRID_WIDTH)
 
 
-if __name__ == "__main__":
-    # execute only if run as a script
-    main()
+if __name__ == '__main__':
+    app.run()
