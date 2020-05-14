@@ -18,7 +18,7 @@
         <table id="table" class="table table-bordered table-responsive-xl" frame="box" rules="all">
             {% for key, value in values %}
                 {% if loop.index % width == 1 %}<tr>{% endif %}
-                <td id="{{ key }}" class="col-2 align-middle">{{ value }}</td>
+                <td id="{{ key }}" class="align-middle">{{ value }}</td>
                 {% if loop.index % width == 0 %}</tr>{% endif %}
             {% endfor %}
         </table>
