@@ -1,54 +1,33 @@
 import csv
 import random
 from sys import stdout
-from typing import List
+from typing import List, Tuple, Iterator
 
-import prettytable
-from prettytable import PrettyTable
+from jinja2 import Template
 
 GRID_WIDTH = 5
 
 
-def export_table_to_html(table: PrettyTable) -> None:
+def export_table_to_html(grid_values: Iterator[Tuple[str, str]]) -> str:
     """
-    Export grid to grid.html file
-    :param table: PrettyTable representation of our table.
+    Export grid values to grid.html file
     """
-    with open("grid.html", "w") as file:
-        file.write(table.get_html_string(format=True))
+    with open('template.html') as file_:
+        template = Template(file_.read())
+    with open("index.html", "w") as file:
+        html = template.render(values=grid_values, width=GRID_WIDTH)
+        file.write(html)
+    return html
 
 
-def build_table(grid: List[List[str]]) -> PrettyTable:
-    """
-    Move our 2-dimension list to a PrettyTable representation
-    :param grid: 2-dimension list of the grid
-    :return: PrettyTable representation
-    """
-    table = PrettyTable(header=False,
-                        border=True,
-                        hrules=prettytable.ALL,
-                        vrules=prettytable.ALL,
-                        padding_width=3)
-    [table.add_row(row) for row in grid]
-    return table
-
-
-def generate(entries: List[str]) -> List[List[str]]:
-    """
-    Arrange a list of entries into a grid.
-    Grid size is defined by GRID_WIDTH constant.
-    :param entries: list of entries to be arranged
-    :return: the arranged grid
-    """
-    assert len(entries) == GRID_WIDTH ** 2
-    grid = []
+def get_table_ids():
+    ids: List[str] = []
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     for x in range(GRID_WIDTH):
-        grid.append([])
-        for _ in range(GRID_WIDTH):
-            grid[x].append(entries.pop())
-    # center of grid is "free" space
-    grid[GRID_WIDTH // 2][GRID_WIDTH // 2] = "X"
-    return grid
+        letter = alphabet[x]
+        for y in range(GRID_WIDTH):
+            ids.append(letter + str(y + 1))
+    return ids
 
 
 def get_random_entries(entries: List[str], sub_entries_size=GRID_WIDTH ** 2) -> List[str]:
@@ -59,7 +38,9 @@ def get_random_entries(entries: List[str], sub_entries_size=GRID_WIDTH ** 2) -> 
     :return:
     """
     random.seed()
-    return random.sample(entries, sub_entries_size)
+    sample = random.sample(entries, sub_entries_size)
+    sample[sub_entries_size // 2] = "X"
+    return sample
 
 
 def import_entries() -> List[str]:
@@ -78,10 +59,8 @@ def import_entries() -> List[str]:
 def main():
     entries = import_entries()
     sub_entries = get_random_entries(entries)
-    grid = generate(sub_entries)
-    table = build_table(grid)
-    export_table_to_html(table)
-    stdout.write(table.get_string())
+    html = export_table_to_html(zip(get_table_ids(), sub_entries))
+    stdout.write(html)
 
 
 if __name__ == "__main__":
