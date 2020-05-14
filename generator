@@ -10,7 +10,7 @@ GRID_WIDTH = 5
 
 def export_table_to_html(grid_values: Iterator[Tuple[str, str]]) -> str:
     """
-    Export grid values to grid.html file
+    Export grid values to index.html file
     """
     with open('template.html') as file_:
         template = Template(file_.read())
